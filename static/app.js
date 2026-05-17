@@ -100,4 +100,8 @@ async function analyzeResume() {
             </div>
         `;
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 08620d642400fd3f97331b715acd5fc605201f9e
