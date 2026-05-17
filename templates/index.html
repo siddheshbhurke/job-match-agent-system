@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Job Match</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/style.css"
+    >
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>Smart Job Match</h1>
+
+        <p class="subtitle">
+            AI-Powered Resume Analyzer
+        </p>
+
+        <textarea
+            id="resumeText"
+            placeholder="Paste your resume here..."
+        ></textarea>
+
+        <button onclick="analyzeResume()">
+            Analyze Resume
+        </button>
+
+        <div id="loading">
+            Analyzing resume...
+        </div>
+
+        <div id="results"></div>
+
+    </div>
+
+    <script src="/static/app.js"></script>
+
+</body>
+
+</html>
