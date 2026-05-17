@@ -1,107 +1,337 @@
-async function analyzeResume() {
+const API_BASE =
+    "http://127.0.0.1:8000";
 
-    const resumeText =
+let currentResumeText = "";
+
+// =====================================
+// DOM ELEMENTS
+// =====================================
+
+const recommendBtn =
+    document.getElementById(
+        "recommend-btn"
+    );
+
+const refineBtn =
+    document.getElementById(
+        "refine-btn"
+    );
+
+const resumeInput =
+    document.getElementById(
+        "resume-text"
+    );
+
+const userFeedbackInput =
+    document.getElementById(
+        "user-feedback"
+    );
+
+
+// =====================================
+// RECOMMENDATION FLOW
+// =====================================
+
+recommendBtn.addEventListener(
+    "click",
+    async () => {
+
+        const resumeText =
+            resumeInput.value.trim();
+
+        if (!resumeText) {
+
+            alert(
+                "Please paste resume text"
+            );
+
+            return;
+        }
+
+        currentResumeText =
+            resumeText;
+
+        try {
+
+            recommendBtn.disabled = true;
+
+            recommendBtn.innerText =
+                "Generating...";
+
+            const response = await fetch(
+                `${API_BASE}/recommend`,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        resume_text:
+                            resumeText
+                    })
+                }
+            );
+
+            const data =
+                await response.json();
+
+            console.log(data);
+
+            renderCandidate(
+                data.candidate
+            );
+
+            renderJobs(
+                data.ranked_jobs
+            );
+
+            showClarificationQuestion(
+                data.clarifying_question
+            );
+
+        } catch (error) {
+
+            console.error(error);
+
+            alert(
+                "Failed to generate recommendations"
+            );
+
+        } finally {
+
+            recommendBtn.disabled = false;
+
+            recommendBtn.innerText =
+                "Generate Recommendations";
+        }
+    }
+);
+
+
+// =====================================
+// REFINE FLOW
+// =====================================
+
+refineBtn.addEventListener(
+    "click",
+    async () => {
+
+        const feedback =
+            userFeedbackInput.value.trim();
+
+        if (!feedback) {
+
+            alert(
+                "Please answer the clarifying question"
+            );
+
+            return;
+        }
+
+        try {
+
+            refineBtn.disabled = true;
+
+            refineBtn.innerText =
+                "Refining...";
+
+            const response = await fetch(
+                `${API_BASE}/refine`,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        resume_text:
+                            currentResumeText,
+
+                        user_feedback:
+                            feedback
+                    })
+                }
+            );
+
+            const data =
+                await response.json();
+
+            console.log(data);
+
+            renderJobs(
+                data.ranked_jobs
+            );
+
+        } catch (error) {
+
+            console.error(error);
+
+            alert(
+                "Failed to refine recommendations"
+            );
+
+        } finally {
+
+            refineBtn.disabled = false;
+
+            refineBtn.innerText =
+                "Refine Recommendations";
+        }
+    }
+);
+
+
+// =====================================
+// RENDER CANDIDATE
+// =====================================
+
+function renderCandidate(
+    candidate
+) {
+
+    const section =
         document.getElementById(
-            "resumeText"
-        ).value;
+            "candidate-section"
+        );
 
-    const resultsDiv =
+    const container =
+        document.getElementById(
+            "candidate-info"
+        );
+
+    section.classList.remove(
+        "hidden"
+    );
+
+    let skillsHTML = "";
+
+    if (
+        candidate.skills &&
+        candidate.skills.length
+    ) {
+
+        candidate.skills.forEach(
+            skill => {
+
+                skillsHTML += `
+                    <span class="skill">
+                        ${skill}
+                    </span>
+                `;
+            }
+        );
+    }
+
+    container.innerHTML = `
+
+        <p>
+            <strong>Name:</strong>
+            ${candidate.name}
+        </p>
+
+        <p>
+            <strong>Experience:</strong>
+            ${candidate.experience_years} years
+        </p>
+
+        <p>
+            <strong>Education:</strong>
+            ${candidate.education}
+        </p>
+
+        <div style="margin-top:12px;">
+            <strong>Skills:</strong>
+            <div>
+                ${skillsHTML}
+            </div>
+        </div>
+    `;
+}
+
+
+// =====================================
+// RENDER JOBS
+// =====================================
+
+function renderJobs(
+    jobs
+) {
+
+    const section =
+        document.getElementById(
+            "results-section"
+        );
+
+    const container =
         document.getElementById(
             "results"
         );
 
-    const loadingDiv =
+    section.classList.remove(
+        "hidden"
+    );
+
+    container.innerHTML = "";
+
+    jobs.forEach(job => {
+
+        container.innerHTML += `
+
+            <div class="job-card">
+
+                <h3>
+                    ${job.title}
+                </h3>
+
+                <p>
+                    <strong>Company:</strong>
+                    ${job.company}
+                </p>
+
+                <p>
+                    <strong>Similarity Score:</strong>
+                    ${job.similarity_score}
+                </p>
+
+                <p>
+                    <strong>Explanation:</strong>
+                    ${job.explanation}
+                </p>
+
+            </div>
+        `;
+    });
+}
+
+
+// =====================================
+// SHOW QUESTION
+// =====================================
+
+function showClarificationQuestion(
+    question
+) {
+
+    const section =
         document.getElementById(
-            "loading"
+            "clarification-section"
         );
 
-    resultsDiv.innerHTML = "";
-    loadingDiv.style.display = "block";
-
-    try {
-
-        const response = await fetch(
-            "/recommend",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type":
-                        "application/json"
-                },
-                body: JSON.stringify({
-                    resume_text: resumeText
-                })
-            }
+    const questionElement =
+        document.getElementById(
+            "clarifying-question"
         );
 
-        const data = await response.json();
+    section.classList.remove(
+        "hidden"
+    );
 
-        loadingDiv.style.display = "none";
-
-        let html = `
-            <h2>Candidate Profile</h2>
-
-            <div class="job-card">
-                <p><strong>Name:</strong>
-                ${data.candidate.name}</p>
-
-                <p><strong>Skills:</strong>
-                ${data.candidate.skills.join(", ")}</p>
-
-                <p><strong>Preferred Roles:</strong>
-                ${data.candidate.preferred_roles.join(", ")}</p>
-            </div>
-
-            <h2>Recommended Jobs</h2>
-        `;
-
-        data.ranked_jobs.forEach(job => {
-
-            html += `
-                <div class="job-card">
-
-                    <div class="job-title">
-                        ${job.title}
-                    </div>
-
-                    <div class="company">
-                        ${job.company}
-                    </div>
-
-                    <div class="score">
-                        Match Score:
-                        ${job.similarity_score}
-                    </div>
-
-                    <div class="explanation">
-                        ${job.explanation}
-                    </div>
-
-                </div>
-            `;
-        });
-
-        html += `
-            <div class="job-card">
-                <strong>Clarifying Question:</strong>
-                ${data.clarifying_question}
-            </div>
-        `;
-
-        resultsDiv.innerHTML = html;
-
-    } catch (error) {
-
-        loadingDiv.style.display = "none";
-
-        resultsDiv.innerHTML = `
-            <div class="job-card">
-                Error processing resume.
-            </div>
-        `;
-    }
-<<<<<<< HEAD
+    questionElement.innerText =
+        question;
 }
-=======
-}
->>>>>>> 08620d642400fd3f97331b715acd5fc605201f9e
