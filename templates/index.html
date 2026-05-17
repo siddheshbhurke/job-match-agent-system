@@ -2,40 +2,115 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta charset="UTF-8" />
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    />
+
     <title>Smart Job Match</title>
 
     <link
         rel="stylesheet"
         href="/static/style.css"
-    >
+    />
+
 </head>
 
 <body>
 
     <div class="container">
 
-        <h1>Smart Job Match</h1>
+        <h1>
+            Smart Job Match
+        </h1>
 
         <p class="subtitle">
-            AI-Powered Resume Analyzer
+            AI-Powered Resume Recommendation System
         </p>
 
-        <textarea
-            id="resumeText"
-            placeholder="Paste your resume here..."
-        ></textarea>
+        <!-- ========================= -->
+        <!-- Resume Input -->
+        <!-- ========================= -->
 
-        <button onclick="analyzeResume()">
-            Analyze Resume
-        </button>
+        <div class="card">
 
-        <div id="loading">
-            Analyzing resume...
+            <h2>
+                Paste Resume
+            </h2>
+
+            <textarea
+                id="resume-text"
+                placeholder="Paste resume text here..."
+            ></textarea>
+
+            <button id="recommend-btn">
+                Generate Recommendations
+            </button>
+
         </div>
 
-        <div id="results"></div>
+        <!-- ========================= -->
+        <!-- Candidate Section -->
+        <!-- ========================= -->
+
+        <div
+            id="candidate-section"
+            class="card hidden"
+        >
+
+            <h2>
+                Candidate Information
+            </h2>
+
+            <div id="candidate-info"></div>
+
+        </div>
+
+        <!-- ========================= -->
+        <!-- Results Section -->
+        <!-- ========================= -->
+
+        <div
+            id="results-section"
+            class="card hidden"
+        >
+
+            <h2>
+                Recommended Jobs
+            </h2>
+
+            <div id="results"></div>
+
+        </div>
+
+        <!-- ========================= -->
+        <!-- Clarification Section -->
+        <!-- ========================= -->
+
+        <div
+            id="clarification-section"
+            class="card hidden"
+        >
+
+            <h2>
+                Clarifying Question
+            </h2>
+
+            <p id="clarifying-question"></p>
+
+            <textarea
+                id="user-feedback"
+                placeholder="Answer the clarifying question..."
+            ></textarea>
+
+            <button id="refine-btn">
+                Refine Recommendations
+            </button>
+
+        </div>
 
     </div>
 
@@ -43,8 +118,4 @@
 
 </body>
 
-<<<<<<< HEAD
 </html>
-=======
-</html>
->>>>>>> 08620d642400fd3f97331b715acd5fc605201f9e
